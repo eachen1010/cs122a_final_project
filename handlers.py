@@ -4,28 +4,28 @@
 
 import csv
 import os
-# import mysql.connector
+import mysql.connector
 
 IMPORT_CSV_FILENAMES = {
+    "User": "User.csv",
     "AgentClient": "AgentClient.csv",
     "AgentCreator": "AgentCreator.csv",
     "BaseModel": "BaseModel.csv",
     "Configuration": "Configuration.csv",
-    "CustomizedModel": "CustomizedModel.csv",
-    "DataStorage": "DataStorage.csv",
     "InternetService": "InternetService.csv",
+    "DataStorage": "DataStorage.csv",
     "LLMService": "LLMService.csv",
+    "CustomizedModel": "CustomizedModel.csv",
     "ModelConfigurations": "ModelConfigurations.csv",
     "ModelServices": "ModelServices.csv",
-    "User": "User.csv"
 }
-DB_HOST = "localhost"
-DB_USER = "test"
-DB_PASS = "password"  
+# DB_HOST = "localhost"
+# DB_USER = "test"
+# DB_PASS = "password"  
 
-# DB_HOST = "127.0.0.1"
-# DB_USER = "root"
-# DB_PASS = "YourPasswordHere" 
+DB_HOST = "127.0.0.1"
+DB_USER = "root"
+DB_PASS = "YourPasswordHere" 
 
 
 # Connects to db and returns the connectino and cursor
@@ -33,7 +33,8 @@ def connect_db():
     db = mysql.connector.connect(
         host=DB_HOST,
         user=DB_USER,
-        password=DB_PASS
+        password=DB_PASS,
+        database="cs122a"
     )
 
     cursor = db.cursor(buffered=True)
@@ -66,6 +67,8 @@ def func_import(folder_name: str) -> None:
                 print(f"Error: {err}")
                 print(f"Failed SQL Command: {cmd}")
     
+    db.commit()
+    
     # Import data from CSV files in folder_name
     for table, filename in IMPORT_CSV_FILENAMES.items():
         file_path = os.path.join(folder_name, filename)
@@ -78,9 +81,11 @@ def func_import(folder_name: str) -> None:
             reader = csv.DictReader(f)
             column_names = reader.fieldnames
             
-            query = f"INSERT INTO {table} VALUES (%s, $s, $s)"
+            query = f"INSERT INTO cs122a.{table}({", ".join(column_names)}) VALUES ({", ".join(["%s" for _ in column_names])})"
+            print(query)
             for row in reader:
                 values = tuple(row[col] for col in column_names)
+                print(values)
 
                 cursor.execute(query, values)
 

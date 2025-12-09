@@ -46,10 +46,10 @@ CREATE TABLE BaseModel (
 );
 
 CREATE TABLE CustomizedModel (
-  mid INTEGER UNIQUE,
+  mid INTEGER,
   bmid INTEGER NOT NULL,
 
-  PRIMARY KEY (bmid, mid),
+  PRIMARY KEY (mid),
   FOREIGN KEY (bmid) REFERENCES BaseModel(bmid)
 	ON DELETE CASCADE
 );
@@ -110,9 +110,9 @@ CREATE TABLE ModelConfigurations (
    cid INTEGER,
    mid INTEGER NOT NULL,
    bmid INTEGER NOT NULL,
-   duration TIME,
+   duration INTEGER,
 
-   PRIMARY KEY (cid),
+   PRIMARY KEY (cid, mid),
    FOREIGN KEY (mid) REFERENCES CustomizedModel(mid),
    FOREIGN KEY (bmid) REFERENCES BaseModel(bmid)
 );

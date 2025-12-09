@@ -101,14 +101,14 @@ def func_insert_agent_client(uid: int, username: str, email: str, card_number: i
     db, cursor = connect_db()
     
     # Insert a new agent client into the table
-    commands = [f'INSERT INTO User (uid, username, email) VALUES ({uid}, \'{username}\', \'{email}\');',
+    # f'INSERT INTO User (uid, username, email) VALUES ({uid}, \'{username}\', \'{email}\');',
+    commands = [
         f'INSERT INTO AgentClient (uid, cardno, cardholder, expire, cvv, zip, interests) VALUES ({uid}, {card_number}, \'{card_holder}\', \'{expiration_date}\', {cvv}, {zip_code}, \'{interests}\');']
 
     for cmd in commands:
         try:
+            # print(cmd)
             cursor.execute(cmd)
-            if cursor.with_rows:
-                print(cursor.fetchall())
         except mysql.connector.Error as err:
             close_db(db, cursor)
             return "Fail"
@@ -123,18 +123,19 @@ def func_insert_agent_client(uid: int, username: str, email: str, card_number: i
 def func_add_customized_model(mid: int, bmid: int) -> None:
     db, cursor = connect_db()
     
-    query = f'INSERT INTO CustomizedModel (mid, bmid) VALUES (%s, %s));'
-    values = (mid, bmid)
+    # Insert a new agent client into the table
+    commands = [f'INSERT INTO CustomizedModel (mid, bmid) VALUES ({mid}, {bmid});']
 
-    try:
-        cursor.execute(query, values)
-        if cursor.with_rows:
-            print(cursor.fetchall())
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-        print(f"Failed SQL Command: {cmd}")
-        close_db(db, cursor)
-        return "Fail"
+    for cmd in commands:
+        try:
+            cursor.execute(cmd)
+            if cursor.with_rows:
+                print(cursor.fetchall())
+        except mysql.connector.Error as err:
+            # print(f"Error: {err}")
+            # print(f"Failed SQL Command: {cmd}")
+            close_db(db, cursor)
+            return "Fail"
 
     db.commit()
     close_db(db, cursor)
@@ -144,48 +145,31 @@ def func_add_customized_model(mid: int, bmid: int) -> None:
 # Delete a base model from the tables.
 # Use: python3 project.py deleteBaseModel [bmid:int]
 def func_delete_base_model(bmid: int) -> None:
-    db, cursor = connect_db()
-    
-    query = f'DELETE FROM BaseModel WHERE bmid = %s;'
-    values = (bmid)
-
-    try:
-        cursor.execute(query, values)
-        if cursor.with_rows:
-            print(cursor.fetchall())
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-        print(f"Failed SQL Command: {cmd}")
-        close_db(db, cursor)
-        return "Fail"
-
-    db.commit()
-    close_db(db, cursor)
-    return "Success"
+    return "Fail"
 
 # 5. List internet service
 # Given a base model id, list all the internet services that the model is utilizing, sorted by provider’s name in ascending order. 
 # Use python3 project.py listInternetService [bmid:int]
 def func_list_internet_service(bmid: int) -> None:
-    pass
+    return "Fail"
 
 # 6. Count customized model
 # Given a list of base model id, for each base model id, count on the numbers of customized models that build from it. Sort the results in ascending order of base model id. 
 # Use: python3 project.py countCustomizedModel [bmid1:int] [bmid2:int] [bmid3:int]
 def func_count_customized_model(bmid_list: list[int]) -> None:
-    pass
+    return "Fail"
 
 # 7. Find Top-N longest duration configuration  
 # Given an agent client id, list the top-N longest duration configurations with the longest duration managed by that client. Sort the configurations by duration in descending order. 
 # Use: python3 project.py topNDurationConfig [uid:int] [N:int]
 def func_top_n_duration_config(uid: int, N: int) -> None:
-    pass
+    return "Fail"
 
 # 8. Keyword search
 # List 5 base models that are utilizing LLM services whose domain contains the keyword “video”. (If there are fewer than 5 base models that satisfy the condition, list them all.) Sort the results by bmid in ascending order. 
 # Use: python3 project.py listBaseModelKeyWord [keyword:str]
 def func_list_base_model_keyword(keyword: str) -> None:
-    pass
+    return "Fail"
 
 # 9. Experiment: Solving NL2SQL with LLM 
 # NL2SQL, or text-to-SQL, is a task that translates natural language queries into SQL queries. NL2SQL is an interdisciplinary study between NLP (natural language processing) and database systems. In this project, the previously required functions also fall under the NL2SQL category — students play the role of converting natural language (NL) into SQL queries.

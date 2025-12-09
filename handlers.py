@@ -19,13 +19,21 @@ IMPORT_CSV_FILENAMES = {
     "ModelServices": "ModelServices.csv",
     "User": "User.csv"
 }
+DB_HOST = "localhost"
+DB_USER = "test"
+DB_PASS = "password"  
+
+# DB_HOST = "127.0.0.1"
+# DB_USER = "root"
+# DB_PASS = "YourPasswordHere" 
+
 
 # Connects to db and returns the connectino and cursor
 def connect_db():
     db = mysql.connector.connect(
-        host="127.0.0.1",
-        user="root",
-        password="YourPasswordHere"
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASS
     )
 
     cursor = db.cursor(buffered=True)
@@ -35,7 +43,6 @@ def connect_db():
 def close_db(db, cursor):
     cursor.close()
     db.close()
-
 
 
 
@@ -79,13 +86,35 @@ def func_import(folder_name: str) -> None:
 
     db.commit()
     close_db(db, cursor)
+    return "Success"
 
 
 # 2. Insert Agent Client
 # Insert a new agent client into the related tables.
 # Use: python3 project.py insertAgentClient [uid:int] [username:str] [email:str] [card_number:int] [card_holder:str] [expiration_date:date] [cvv:int] [zip:int] [interests:str]
 def func_insert_agent_client(uid: int, username: str, email: str, card_number: int, card_holder: str, expiration_date: str, cvv: int, zip_code: int, interests: str) -> None:
-    pass
+    db, cursor = connect_db()
+    
+    # Insert a new agent client into the table
+    commands = [f'INSERT INTO cs122a_project.User (uid, username, email) VALUES ({uid}, \'{username}\', \'{email}\');',
+        f'INSERT INTO cs122a_project.AgentClient (uid, cardno, cardholder, expire, cvv, zip, interests) VALUES ({uid}, {card_number}, \'{card_holder}\', \'{expiration_date}\', {cvv}, {zip_code}, \'{interests}\');']
+
+    for cmd in commands:
+        try:
+            cursor.execute(cmd)
+            if cursor.with_rows:
+                print(cursor.fetchall())
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            print(f"Failed SQL Command: {cmd}")
+            close_db(db, cursor)
+            return "Fail"
+    
+    # Import data from CSV files in folder_name
+
+    db.commit()
+    close_db(db, cursor)
+    return "Success"
 
 # 3. Add a customized model
 # Add a new customized model to the tables.

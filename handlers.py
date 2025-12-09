@@ -2,15 +2,23 @@
 # 
 # handler functions for CS 122a final project
 
-import mysql.connector
+import csv
+import os
+# import mysql.connector
 
-INSERT_AGENT_CLIENT_QUERY = "INSERT INTO AgentClient (uid, username, email, card_number, card_holder, expiration_date, cvv, zip, interests) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
-ADD_CUSTOMIZED_MODEL_QUERY = "INSERT INTO CustomizedModel (mid, bmid) VALUES (%s, %s);"
-DELETE_BASE_MODEL_QUERY = "DELETE FROM BaseModel WHERE bmid = %s;"
-LIST_INTERNET_SERVICE_QUERY = "SELECT * FROM InternetService WHERE bmid = %s ORDER BY provider_name ASC;"
-COUNT_CUSTOMIZED_MODEL_QUERY = "SELECT bmid, COUNT(*) FROM CustomizedModel WHERE bmid IN (%s) GROUP BY bmid ORDER BY bmid ASC;"
-TOP_N_DURATION_CONFIG_QUERY = "SELECT * FROM Configuration WHERE uid = %s ORDER BY duration DESC LIMIT %s;"
-LIST_BASE_MODEL_KEYWORD_QUERY = "SELECT * FROM BaseModel WHERE llm_service_domain LIKE %s ORDER BY bmid ASC LIMIT 5;"
+IMPORT_CSV_FILENAMES = {
+    "AgentClient": "AgentClient.csv",
+    "AgentCreator": "AgentCreator.csv",
+    "BaseModel": "BaseModel.csv",
+    "Configuration": "Configuration.csv",
+    "CustomizedModel": "CustomizedModel.csv",
+    "DataStorage": "DataStorage.csv",
+    "InternetService": "InternetService.csv",
+    "LLMService": "LLMService.csv",
+    "ModelConfigurations": "ModelConfigurations.csv",
+    "ModelServices": "ModelServices.csv",
+    "User": "User.csv"
+}
 DB_HOST = "localhost"
 DB_USER = "test"
 DB_PASS = "password"  
@@ -18,6 +26,7 @@ DB_PASS = "password"
 # DB_HOST = "127.0.0.1"
 # DB_USER = "root"
 # DB_PASS = "YourPasswordHere" 
+
 
 # Connects to db and returns the connectino and cursor
 def connect_db():
@@ -58,6 +67,22 @@ def func_import(folder_name: str) -> None:
                 print(f"Failed SQL Command: {cmd}")
     
     # Import data from CSV files in folder_name
+    for table, filename in IMPORT_CSV_FILENAMES.items():
+        file_path = os.path.join(folder_name, filename)
+        print(file_path)
+        
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError(f"File {file_path} does not exist.")
+        
+        with open(file_path, 'r') as f:
+            reader = csv.DictReader(f)
+            column_names = reader.fieldnames
+            
+            query = f"INSERT INTO {table} VALUES (%s, $s, $s)"
+            for row in reader:
+                values = tuple(row[col] for col in column_names)
+
+                cursor.execute(query, values)
 
     db.commit()
     close_db(db, cursor)

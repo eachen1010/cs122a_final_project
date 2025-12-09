@@ -19,13 +19,13 @@ IMPORT_CSV_FILENAMES = {
     "ModelConfigurations": "ModelConfigurations.csv",
     "ModelServices": "ModelServices.csv",
 }
-# DB_HOST = "localhost"
-# DB_USER = "test"
-# DB_PASS = "password"  
+DB_HOST = "localhost"
+DB_USER = "test"
+DB_PASS = "password"  
 
-DB_HOST = "127.0.0.1"
-DB_USER = "root"
-DB_PASS = "YourPasswordHere" 
+# DB_HOST = "127.0.0.1"
+# DB_USER = "root"
+# DB_PASS = "YourPasswordHere" 
 
 
 # Connects to db and returns the connectino and cursor

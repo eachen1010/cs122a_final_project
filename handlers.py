@@ -112,8 +112,6 @@ def func_insert_agent_client(uid: int, username: str, email: str, card_number: i
         except mysql.connector.Error as err:
             close_db(db, cursor)
             return "Fail"
-    
-    # Import data from CSV files in folder_name
 
     db.commit()
     close_db(db, cursor)
@@ -125,22 +123,18 @@ def func_insert_agent_client(uid: int, username: str, email: str, card_number: i
 def func_add_customized_model(mid: int, bmid: int) -> None:
     db, cursor = connect_db()
     
-    # Insert a new agent client into the table
-    commands = [f'INSERT INTO User (uid, username, email) VALUES ({uid}, \'{username}\', \'{email}\');',
-        f'INSERT INTO AgentClient (uid, cardno, cardholder, expire, cvv, zip, interests) VALUES ({uid}, {card_number}, \'{card_holder}\', \'{expiration_date}\', {cvv}, {zip_code}, \'{interests}\');']
+    query = f'INSERT INTO CustomizedModel (mid, bmid) VALUES (%s, %s));'
+    values = (mid, bmid)
 
-    for cmd in commands:
-        try:
-            cursor.execute(cmd)
-            if cursor.with_rows:
-                print(cursor.fetchall())
-        except mysql.connector.Error as err:
-            print(f"Error: {err}")
-            print(f"Failed SQL Command: {cmd}")
-            close_db(db, cursor)
-            return "Fail"
-    
-    # Import data from CSV files in folder_name
+    try:
+        cursor.execute(query, values)
+        if cursor.with_rows:
+            print(cursor.fetchall())
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        print(f"Failed SQL Command: {cmd}")
+        close_db(db, cursor)
+        return "Fail"
 
     db.commit()
     close_db(db, cursor)

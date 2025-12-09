@@ -14,7 +14,7 @@ CREATE TABLE User (
 
 CREATE TABLE AgentCreator (
   uid INTEGER,
-  payoutaccount VARCHAR(255),
+  payout VARCHAR(255),
   bio VARCHAR(255),
   
   PRIMARY KEY (uid),
@@ -23,9 +23,9 @@ CREATE TABLE AgentCreator (
 
 CREATE TABLE AgentClient (
   uid INTEGER,
-  cardnumber VARCHAR(255),
-  cardholdername VARCHAR(255),
-  expirationdate VARCHAR(255),
+  cardno VARCHAR(255),
+  cardholder VARCHAR(255),
+  expire VARCHAR(255),
   cvv VARCHAR(255),
   zip VARCHAR(255),
   interests VARCHAR(255),
@@ -38,11 +38,11 @@ CREATE TABLE AgentClient (
 
 CREATE TABLE BaseModel (
   bmid INTEGER,
-  uid INTEGER NOT NULL,
+  creator_uid INTEGER NOT NULL,
   description VARCHAR(255),
 
   PRIMARY KEY (bmid),
-  FOREIGN KEY (uid) REFERENCES AgentCreator(uid)
+  FOREIGN KEY (creator_uid) REFERENCES AgentCreator(uid)
 );
 
 CREATE TABLE CustomizedModel (
@@ -58,19 +58,19 @@ CREATE TABLE CustomizedModel (
 
 CREATE TABLE Configuration (
   cid INTEGER,
-  uid INTEGER NOT NULL,
+  client_uid INTEGER NOT NULL,
   content VARCHAR(255),
   labels VARCHAR(255),
 
   PRIMARY KEY (cid),
-  FOREIGN KEY (uid) REFERENCES AgentClient(uid)
+  FOREIGN KEY (client_uid) REFERENCES AgentClient(uid)
 );
 
 -- Q4: Internet Services: LLM/Data Storage (SQL DDL for entity(ies) table(s) only)
 
 CREATE TABLE InternetService (
   sid INTEGER,
-  endpoint VARCHAR(255),
+  endpoints VARCHAR(1000),
   provider VARCHAR(255),
 
   PRIMARY KEY (sid)
@@ -84,7 +84,7 @@ CREATE TABLE LLMService (
   FOREIGN KEY (sid) REFERENCES InternetService(sid)
 );
 
-CREATE TABLE DataStorageService (
+CREATE TABLE DataStorage (
   sid INTEGER,
   type VARCHAR(255),
 
@@ -95,7 +95,7 @@ CREATE TABLE DataStorageService (
 
 -- Q5: Write additional SQL DDL for relationship(s) table(s) below
 
-CREATE TABLE Utilizes (
+CREATE TABLE ModelServices (
     bmid INTEGER,
     sid INTEGER,
     version VARCHAR(20),
@@ -106,7 +106,7 @@ CREATE TABLE Utilizes (
     FOREIGN KEY (sid) REFERENCES InternetService(sid)
 );
 
-CREATE TABLE Uses (
+CREATE TABLE ModelConfigurations (
    cid INTEGER,
    mid INTEGER NOT NULL,
    bmid INTEGER NOT NULL,

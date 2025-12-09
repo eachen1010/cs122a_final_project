@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS cs122a_project;
-CREATE DATABASE cs122a_project;
-USE cs122a_project;
+DROP DATABASE IF EXISTS cs122a;
+CREATE DATABASE cs122a;
+USE cs122a;
 
 -- Q1: User and Agent Creator/Client (SQL DDL for entity(ies) table(s) only)
 

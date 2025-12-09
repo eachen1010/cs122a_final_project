@@ -61,8 +61,8 @@ def func_import(folder_name: str) -> None:
         for cmd in commands:
             try:
                 cursor.execute(cmd)
-                if cursor.with_rows:
-                    print(cursor.fetchall())
+                # if cursor.with_rows:
+                #     print(cursor.fetchall())
             except mysql.connector.Error as err:
                 print(f"Error: {err}")
                 print(f"Failed SQL Command: {cmd}")
@@ -72,7 +72,7 @@ def func_import(folder_name: str) -> None:
     # Import data from CSV files in folder_name
     for table, filename in IMPORT_CSV_FILENAMES.items():
         file_path = os.path.join(folder_name, filename)
-        print(file_path)
+        # print(file_path)
         
         if not os.path.isfile(file_path):
             raise FileNotFoundError(f"File {file_path} does not exist.")
@@ -81,11 +81,11 @@ def func_import(folder_name: str) -> None:
             reader = csv.DictReader(f)
             column_names = reader.fieldnames
             
-            query = f"INSERT INTO cs122a.{table}({", ".join(column_names)}) VALUES ({", ".join(["%s" for _ in column_names])})"
-            print(query)
+            query = f'INSERT INTO cs122a.{table}({", ".join(column_names)}) VALUES ({", ".join(["%s" for _ in column_names])})'
+            # print(query)
             for row in reader:
                 values = tuple(row[col] for col in column_names)
-                print(values)
+                # print(values)
 
                 cursor.execute(query, values)
 

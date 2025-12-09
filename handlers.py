@@ -2,12 +2,60 @@
 # 
 # handler functions for CS 122a final project
 
+import mysql.connector
+
+INSERT_AGENT_CLIENT_QUERY = "INSERT INTO AgentClient (uid, username, email, card_number, card_holder, expiration_date, cvv, zip, interests) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+ADD_CUSTOMIZED_MODEL_QUERY = "INSERT INTO CustomizedModel (mid, bmid) VALUES (%s, %s);"
+DELETE_BASE_MODEL_QUERY = "DELETE FROM BaseModel WHERE bmid = %s;"
+LIST_INTERNET_SERVICE_QUERY = "SELECT * FROM InternetService WHERE bmid = %s ORDER BY provider_name ASC;"
+COUNT_CUSTOMIZED_MODEL_QUERY = "SELECT bmid, COUNT(*) FROM CustomizedModel WHERE bmid IN (%s) GROUP BY bmid ORDER BY bmid ASC;"
+TOP_N_DURATION_CONFIG_QUERY = "SELECT * FROM Configuration WHERE uid = %s ORDER BY duration DESC LIMIT %s;"
+LIST_BASE_MODEL_KEYWORD_QUERY = "SELECT * FROM BaseModel WHERE llm_service_domain LIKE %s ORDER BY bmid ASC LIMIT 5;"   
+
+
+# Connects to db and returns the connectino and cursor
+def connect_db():
+    db = mysql.connector.connect(
+        host="127.0.0.1",
+        user="root",
+        password="YourPasswordHere"
+    )
+
+    cursor = db.cursor(buffered=True)
+
+    return db, cursor
+
+def close_db(db, cursor):
+    cursor.close()
+    db.close()
+
+
+
 
 # 1. Import data
 # Delete existing tables and create new tables. Then read the CSV files in the given folder and import data into the database. You can assume that the folder always contains all the necessary CSV files and that the files are correct.
 # Use: python3 project.py import [folderName:str]
 def func_import(folder_name: str) -> None:
-    pass
+    db, cursor = connect_db()
+    
+    # Remake tables
+    with open("create_schema.sql", 'r') as f:
+        sql_cmds = f.read()
+        commands = [cmd.strip() for cmd in sql_cmds.split(';') if cmd.strip()]
+
+        for cmd in commands:
+            try:
+                cursor.execute(cmd)
+                if cursor.with_rows:
+                    print(cursor.fetchall())
+            except mysql.connector.Error as err:
+                print(f"Error: {err}")
+                print(f"Failed SQL Command: {cmd}")
+    
+    # Import data from CSV files in folder_name
+
+    db.commit()
+    close_db(db, cursor)
 
 
 # 2. Insert Agent Client

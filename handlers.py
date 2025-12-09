@@ -81,7 +81,7 @@ def func_import(folder_name: str) -> None:
             reader = csv.DictReader(f)
             column_names = reader.fieldnames
             
-            query = f'INSERT INTO cs122a.{table}({", ".join(column_names)}) VALUES ({", ".join(["%s" for _ in column_names])})'
+            query = f'INSERT INTO cs122a.{table}({", ".join(column_names)}) VALUES ({", ".join(["%s" for _ in column_names])});'
             # print(query)
             for row in reader:
                 values = tuple(row[col] for col in column_names)
@@ -144,7 +144,24 @@ def func_add_customized_model(mid: int, bmid: int) -> None:
 # Delete a base model from the tables.
 # Use: python3 project.py deleteBaseModel [bmid:int]
 def func_delete_base_model(bmid: int) -> None:
-    pass
+    db, cursor = connect_db()
+    
+    query = f'DELETE FROM BaseModel WHERE bmid = %s;'
+    values = (bmid)
+
+    try:
+        cursor.execute(query, values)
+        if cursor.with_rows:
+            print(cursor.fetchall())
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        print(f"Failed SQL Command: {cmd}")
+        close_db(db, cursor)
+        return "Fail"
+
+    db.commit()
+    close_db(db, cursor)
+    return "Success"
 
 # 5. List internet service
 # Given a base model id, list all the internet services that the model is utilizing, sorted by provider’s name in ascending order. 

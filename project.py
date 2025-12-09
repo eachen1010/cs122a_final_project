@@ -45,4 +45,4 @@ if __name__ == "__main__":
     func, args = parse_input(sys.argv[1:])
 
     # Call function with provided arguments
-    func(*args)
+    print(func(*args))

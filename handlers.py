@@ -201,7 +201,37 @@ def func_count_customized_model(*bmid_list: list[int]) -> None:
 # Given an agent client id, list the top-N longest duration configurations with the longest duration managed by that client. Sort the configurations by duration in descending order. 
 # Use: python3 project.py topNDurationConfig [uid:int] [N:int]
 def func_top_n_duration_config(uid: int, N: int) -> None:
-    return "Fail"
+    db, cursor = connect_db()
+    
+    # Top-N longest duration config
+    command = (
+        "SELECT ac.uid AS client_uid, mc.cid AS config_id, c.labels, c.content, mc.duration "
+        "FROM ModelConfigurations mc "
+        "JOIN Configuration c ON mc.cid = c.cid "
+        "JOIN AgentClient ac ON c.client_uid = ac.uid "
+        "WHERE ac.uid = %s "
+        "AND mc.duration = ( "
+        "    SELECT MAX(mc2.duration) "
+        "    FROM ModelConfigurations mc2 "
+        "    WHERE mc2.cid = mc.cid "
+        ") "
+        "ORDER BY mc.duration DESC "
+        "LIMIT %s;"
+    )
+    try:
+        cursor.execute(command, (int(uid), int(N)))
+        results = cursor.fetchall()
+        output = "\n".join([",".join(map(str, row)) for row in results])
+        db.commit()
+        close_db(db, cursor)
+        return output
+    except mysql.connector.Error as err:
+        print(cursor.statement)
+        print(err)
+        close_db(db, cursor)
+        return "Fail"
+
+    
 
 # 8. Keyword search
 # List 5 base models that are utilizing LLM services whose domain contains the keyword “video”. (If there are fewer than 5 base models that satisfy the condition, list them all.) Sort the results by bmid in ascending order. 

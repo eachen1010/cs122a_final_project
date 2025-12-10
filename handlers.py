@@ -106,12 +106,12 @@ def func_insert_agent_client(uid: int, username: str, email: str, card_number: i
 
     try:
         cursor.execute(command, values)
+        db.commit()
     except mysql.connector.Error as err:
-        close_db(db, cursor)
         return "Fail"
+    finally:
+        close_db(db, cursor)
 
-    db.commit()
-    close_db(db, cursor)
     return "Success"
 
 # 3. Add a customized model
@@ -126,12 +126,12 @@ def func_add_customized_model(mid: int, bmid: int) -> None:
 
     try:
         cursor.execute(command, values)
+        db.commit()
     except mysql.connector.Error as err:
-        close_db(db, cursor)
         return "Fail"
+    finally:
+        close_db(db, cursor)
 
-    db.commit()
-    close_db(db, cursor)
     return "Success"
 
 # 4. Delete a base model
@@ -146,16 +146,14 @@ def func_delete_base_model(bmid: int) -> int:
 
     try:
         cursor.execute(command, values)
+        if cursor.rowcount == 0:
+            return "Fail"
+        db.commit()
     except mysql.connector.Error as err:
-        close_db(db, cursor)
         return "Fail"
-    
-    if cursor.rowcount == 0:
+    finally:
         close_db(db, cursor)
-        return "Fail"
 
-    db.commit()
-    close_db(db, cursor)
     return "Success"
 
 # 5. List internet service
@@ -237,7 +235,25 @@ def func_top_n_duration_config(uid: int, N: int) -> None:
 # List 5 base models that are utilizing LLM services whose domain contains the keyword “video”. (If there are fewer than 5 base models that satisfy the condition, list them all.) Sort the results by bmid in ascending order. 
 # Use: python3 project.py listBaseModelKeyWord [keyword:str]
 def func_list_base_model_keyword(keyword: str) -> None:
-    return "Fail"
+    db, cursor = connect_db()
+    
+    command =   "SELECT DISTINCT ms.bmid, llm.sid, ins.provider, llm.domain " \
+                "FROM LLMService llm " \
+                "JOIN ModelServices ms ON llm.sid = ms.sid " \
+                "JOIN InternetService ins ON ms.sid = ins.sid " \
+                "WHERE llm.domain LIKE %s " \
+                "ORDER BY ms.bmid ASC LIMIT 5;"
+    values = (f'%{keyword}%',)
+
+    try:
+        cursor.execute(command, values)
+        results = cursor.fetchall()
+        output = "\n".join([",".join(map(str, row)) for row in results])
+        return output
+    except mysql.connector.Error as err:
+        return "Fail"
+    finally:
+        close_db(db, cursor)
 
 # 9. Experiment: Solving NL2SQL with LLM 
 # NL2SQL, or text-to-SQL, is a task that translates natural language queries into SQL queries. NL2SQL is an interdisciplinary study between NLP (natural language processing) and database systems. In this project, the previously required functions also fall under the NL2SQL category — students play the role of converting natural language (NL) into SQL queries.

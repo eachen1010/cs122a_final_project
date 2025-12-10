@@ -220,16 +220,11 @@ def func_top_n_duration_config(uid: int, N: int) -> None:
         cursor.execute(command, (int(uid), int(N)))
         results = cursor.fetchall()
         output = "\n".join([",".join(map(str, row)) for row in results])
-        db.commit()
-        close_db(db, cursor)
         return output
     except mysql.connector.Error as err:
-        print(cursor.statement)
-        print(err)
-        close_db(db, cursor)
         return "Fail"
-
-    
+    finally:
+        close_db(db, cursor)
 
 # 8. Keyword search
 # List 5 base models that are utilizing LLM services whose domain contains the keyword “video”. (If there are fewer than 5 base models that satisfy the condition, list them all.) Sort the results by bmid in ascending order. 

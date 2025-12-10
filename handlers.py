@@ -181,8 +181,21 @@ def func_list_internet_service(bmid: int) -> None:
 # 6. Count customized model
 # Given a list of base model id, for each base model id, count on the numbers of customized models that build from it. Sort the results in ascending order of base model id. 
 # Use: python3 project.py countCustomizedModel [bmid1:int] [bmid2:int] [bmid3:int]
-def func_count_customized_model(bmid_list: list[int]) -> None:
-    return "Fail"
+def func_count_customized_model(*bmid_list: list[int]) -> None:
+    db, cursor = connect_db()
+    
+    # Select internet services connected to given base model id
+    command = f'SELECT bm.bmid, bm.description, COUNT(*) FROM CustomizedModel cm JOIN BaseModel bm ON cm.bmid = bm.bmid WHERE cm.bmid IN ({", ".join(bmid_list)}) GROUP BY bm.bmid, bm.description ORDER BY bm.bmid ASC;'
+
+    try:
+        cursor.execute(command)
+        results = cursor.fetchall()
+        output = "\n".join([",".join(map(str, row)) for row in results])
+        return output
+    except mysql.connector.Error as err:
+        return "Fail"
+    finally:
+        close_db(db, cursor)
 
 # 7. Find Top-N longest duration configuration  
 # Given an agent client id, list the top-N longest duration configurations with the longest duration managed by that client. Sort the configurations by duration in descending order. 

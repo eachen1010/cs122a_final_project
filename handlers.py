@@ -106,12 +106,12 @@ def func_insert_agent_client(uid: int, username: str, email: str, card_number: i
 
     try:
         cursor.execute(command, values)
+        db.commit()
     except mysql.connector.Error as err:
-        close_db(db, cursor)
         return "Fail"
+    finally:
+        close_db(db, cursor)
 
-    db.commit()
-    close_db(db, cursor)
     return "Success"
 
 # 3. Add a customized model
@@ -126,12 +126,12 @@ def func_add_customized_model(mid: int, bmid: int) -> None:
 
     try:
         cursor.execute(command, values)
+        db.commit()
     except mysql.connector.Error as err:
-        close_db(db, cursor)
         return "Fail"
+    finally:
+        close_db(db, cursor)
 
-    db.commit()
-    close_db(db, cursor)
     return "Success"
 
 # 4. Delete a base model
@@ -146,16 +146,14 @@ def func_delete_base_model(bmid: int) -> int:
 
     try:
         cursor.execute(command, values)
+        if cursor.rowcount == 0:
+            return "Fail"
+        db.commit()
     except mysql.connector.Error as err:
-        close_db(db, cursor)
         return "Fail"
-    
-    if cursor.rowcount == 0:
+    finally:
         close_db(db, cursor)
-        return "Fail"
 
-    db.commit()
-    close_db(db, cursor)
     return "Success"
 
 # 5. List internet service
@@ -223,7 +221,6 @@ def func_list_base_model_keyword(keyword: str) -> None:
         output = "\n".join([",".join(map(str, row)) for row in results])
         return output
     except mysql.connector.Error as err:
-        print(f"Error: {err}")
         return "Fail"
     finally:
         close_db(db, cursor)

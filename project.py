@@ -12,6 +12,7 @@ from handlers import (
     func_count_customized_model,
     func_top_n_duration_config,
     func_list_base_model_keyword,
+    func_print_nl2sql_result
 )
 
 FUNCTION_MAPPINGS = {
@@ -23,6 +24,7 @@ FUNCTION_MAPPINGS = {
     "countCustomizedModel": func_count_customized_model,
     "topNDurationConfig": func_top_n_duration_config,
     "listBaseModelKeyWord": func_list_base_model_keyword,
+    "printNL2SQLresult": func_print_nl2sql_result,
 }
 
 

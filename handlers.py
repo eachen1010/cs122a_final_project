@@ -137,8 +137,26 @@ def func_add_customized_model(mid: int, bmid: int) -> None:
 # 4. Delete a base model
 # Delete a base model from the tables.
 # Use: python3 project.py deleteBaseModel [bmid:int]
-def func_delete_base_model(bmid: int) -> None:
-    return "Fail"
+def func_delete_base_model(bmid: int) -> int:
+    db, cursor = connect_db()
+    
+    # Remove base model from the table
+    command = "DELETE FROM BaseModel WHERE bmid = %s;"
+    values = (bmid,)
+
+    try:
+        cursor.execute(command, values)
+    except mysql.connector.Error as err:
+        close_db(db, cursor)
+        return "Fail"
+    
+    if cursor.rowcount == 0:
+        close_db(db, cursor)
+        return "Fail"
+
+    db.commit()
+    close_db(db, cursor)
+    return "Success"
 
 # 5. List internet service
 # Given a base model id, list all the internet services that the model is utilizing, sorted by provider’s name in ascending order. 

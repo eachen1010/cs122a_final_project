@@ -102,7 +102,8 @@ CREATE TABLE ModelServices (
 
     PRIMARY KEY (bmid, sid),
 
-    FOREIGN KEY (bmid) REFERENCES BaseModel(bmid),
+    FOREIGN KEY (bmid) REFERENCES BaseModel(bmid)
+      ON DELETE CASCADE,
     FOREIGN KEY (sid) REFERENCES InternetService(sid)
 );
 
@@ -115,4 +116,5 @@ CREATE TABLE ModelConfigurations (
    PRIMARY KEY (cid, mid),
    FOREIGN KEY (mid) REFERENCES CustomizedModel(mid),
    FOREIGN KEY (bmid) REFERENCES BaseModel(bmid)
+    ON DELETE CASCADE
 );

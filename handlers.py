@@ -249,6 +249,3 @@ def func_list_base_model_keyword(keyword: str) -> None:
         return "Fail"
     finally:
         close_db(db, cursor)
-
-# 9. Experiment: Solving NL2SQL with LLM 
-# NL2SQL, or text-to-SQL, is a task that translates natural language queries into SQL queries. NL2SQL is an interdisciplinary study between NLP (natural language processing) and database systems. In this project, the previously required functions also fall under the NL2SQL category — students play the role of converting natural language (NL) into SQL queries.

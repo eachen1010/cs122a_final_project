@@ -162,7 +162,21 @@ def func_delete_base_model(bmid: int) -> int:
 # Given a base model id, list all the internet services that the model is utilizing, sorted by provider’s name in ascending order. 
 # Use python3 project.py listInternetService [bmid:int]
 def func_list_internet_service(bmid: int) -> None:
-    return "Fail"
+    db, cursor = connect_db()
+    
+    # Select internet services connected to given base model id
+    command = "SELECT ins.sid, ins.endpoints, ins.provider FROM InternetService ins JOIN ModelServices ms ON ins.sid = ms.sid WHERE ms.bmid = %s ORDER BY ins.provider ASC;"
+    values = (bmid,)
+
+    try:
+        cursor.execute(command, values)
+        results = cursor.fetchall()
+        output = "\n".join([",".join(map(str, row)) for row in results])
+        return output
+    except mysql.connector.Error as err:
+        return "Fail"
+    finally:
+        close_db(db, cursor)
 
 # 6. Count customized model
 # Given a list of base model id, for each base model id, count on the numbers of customized models that build from it. Sort the results in ascending order of base model id. 
